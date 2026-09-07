@@ -32,8 +32,8 @@ app.use('/api/cart', cartRoutes);
 //server frontend in production
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../frontend/build')));
-    app.get('*', (req, res) => {
-        res.sendFile(path.resolve(__dirname, '../frontend/build/index.html'));
+    app.get('/{*splat}', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../frontend/build/index.html'));
     });
 } else {
         app.get("/", (req,res) => {
