@@ -1,0 +1,27 @@
+{
+  "name": "shopnest-mern-stack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "install": "cd backend && npm install && cd ../frontend && npm install",
+    "start": "cd backend && npm start",
+    "dev:server": "cd backend && npm run dev",
+    "dev:client": "cd frontend && npm start",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build": "cd frontend && npm run build",
+    "seed": "npm --prefix backend run seed"
+  },
+  "keywords": [
+    "e-commerce",
+    "shopping",
+    "ecommerce",
+    "microservice"
+  ],
+  "author": "Ambike Jaiswal",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "concurrently": "^10.0.3"
+  }
+}

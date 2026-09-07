@@ -1,0 +1,148 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 50px;
+  background-color: rgba(9, 9, 0, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: sticky;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand a{
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -1px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.navbar-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.navbar-brand a::after {
+    content:  '.';
+    color: #f97316;
+    font-size: 32px;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.navbar-links a, .navbar-links span {
+    font-size: 16px;
+    font-weight: 500;
+    color: #a1a1aa;
+    position: relative;
+}
+
+.navbar-links a:hover, .navbar-links span:hover {
+    color: #f97316;
+}
+
+.navbar-links a::after, .navbar-links span::after {
+    content:  '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #f97316;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.navbar-links a:hover::after, .navbar-links span:hover::after {
+    width: 100%;
+}   
+
+.btn-logout {
+    background: transparent;
+    border: 1px solid #f97316;
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    background-color: #f97316;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family:  inherit;
+    transition: all 0.3s ease;
+}
+.btn-logout:hover {
+    background-color: #310436;
+    border-color: #d47725;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 10px 20px;
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Unknown about it */
+.navbar
+ .logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  /* color: #fff;
+  text-decoration: none; */
+}
+
+.navbar
+    .nav-links {
+        display: flex;
+        gap: 20px;
+        /* align-items: center; */
+    }
+
+.navbar
+    .nav-links
+    a {
+        color: #fff;
+        text-decoration: none;
+        font-size: 1.1rem;
+        transition: color 0.3s;
+    }
+.navbar
+    .nav-links
+    a:hover {
+        color: #ff6347; /* Change to your desired hover color */
+    }
+.navbar
+    .cart-icon {
+        position: relative;
+        font-size: 1.5rem;
+        color: #fff;
+        cursor: pointer;
+    }
+.navbar      
+    .cart-icon
+    .cart-count {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background-color: #ff6347;
+        color: #fff;
+        width: 25px;
+        height: 25px;
+        text-align: center;
+        border-radius: 50%;
+        font-size: 0.8rem;
+        line-height: 25px;
+    }
