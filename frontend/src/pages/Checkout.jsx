@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { clearCart } from "../redux/cartSlice";
+import API from "../api/axios";
 
 const Checkout = () => {
   const { user } = useContext(AuthContext);
@@ -10,13 +11,13 @@ const Checkout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
- const [address, setAddress] = useState({
-  fullName: "",
-  email: "",
-  street: "",
-  city: "",
-  postalCode: "",
-  country: "",
+  const [address, setAddress] = useState({
+    fullName: "",
+    email: "",
+    street: "",
+    city: "",
+    postalCode: "",
+    country: "",
   });
 
   const totalPrice = cartItems.reduce(
@@ -25,73 +26,42 @@ const Checkout = () => {
   );
 
   const bypassPayment = async () => {
-  try {
-    const orderItems = cartItems.map((item) => ({
-      product: item.productId,
-      qty: item.qty,
-      price: item.price,
-    }));
+    try {
+      const orderItems = cartItems.map((item) => ({
+        product: item.productId,
+        qty: item.qty,
+        price: item.price,
+      }));
 
-    const saveOrderRes = await fetch("/api/orders", {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-
-      body: JSON.stringify({
+      await API.post("/orders", {
         items: orderItems,
         totalAmount: totalPrice,
         address,
         paymentId: "bypass_txn_" + Date.now(),
-      }),
-    });
+      });
 
-    if (saveOrderRes.ok) {
       dispatch(clearCart());
       navigate("/ordersuccess");
-    } else {
-      const data = await saveOrderRes.json();
-      console.log(data);
-      alert(data.message || "Order failed.");
-    }
     } catch (err) {
-    console.error("ORDER ERROR:", err);
+      console.error("ORDER ERROR:", err);
+      alert(err.response?.data?.message || "Order failed.");
     }
   };
 
   const handlePayment = async () => {
     try {
       const orderItems = cartItems.map((item) => ({
-            product: item.productId,
-            qty: item.qty,
-            price: item.price,
+        product: item.productId,
+        qty: item.qty,
+        price: item.price,
       }));
 
-      const orderRes = await fetch("/api/payment/order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount: totalPrice,
-        }),
+      // Create Razorpay order
+      const orderRes = await API.post("/payment/order", {
+        amount: totalPrice,
       });
 
-      const orderData = await orderRes.json();
-
-      if (!orderRes.ok) {
-        const fallback = window.confirm(
-          "Razorpay is not configured. Continue anyway?"
-        );
-
-        if (fallback) {
-          return bypassPayment();
-        }
-
-        return;
-      }
+      const orderData = orderRes.data;
 
       const options = {
         key: "rzp_test_TGuwPRsa3NXNb4",
@@ -102,39 +72,26 @@ const Checkout = () => {
         description: "Order Payment",
 
         handler: async function (response) {
-          const verifyRes = await fetch("/api/payment/verify", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(response),
-          });
+          try {
+            // Verify Razorpay payment
+            await API.post("/payment/verify", response);
 
-          if (!verifyRes.ok) {
-            alert("Payment verification failed.");
-            return;
-          }
-
-          const saveOrderRes = await fetch("/api/orders", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-            
-            body: JSON.stringify({
-              items: orderItems ,
+            // Save order in database
+            await API.post("/orders", {
+              items: orderItems,
               totalAmount: totalPrice,
               address,
               paymentId: response.razorpay_payment_id,
-            }),
-          });
+            });
 
-          if (saveOrderRes.ok) {
             dispatch(clearCart());
             navigate("/ordersuccess");
-          } else {
-            alert("Order failed.");
+          } catch (err) {
+            console.error("PAYMENT/ORDER ERROR:", err);
+            alert(
+              err.response?.data?.message ||
+                "Payment verification or order failed."
+            );
           }
         },
 
@@ -152,7 +109,15 @@ const Checkout = () => {
       const razorpay = new window.Razorpay(options);
       razorpay.open();
     } catch (err) {
-      console.error(err);
+      console.error("PAYMENT ERROR:", err);
+
+      const fallback = window.confirm(
+        "Razorpay is not configured. Continue anyway?"
+      );
+
+      if (fallback) {
+        return bypassPayment();
+      }
     }
   };
 
@@ -174,7 +139,6 @@ const Checkout = () => {
 
       <div className="checkout-content">
         <form onSubmit={handleSubmit} className="shipping-form">
-
           <h3>Shipping Address</h3>
 
           <input
@@ -203,8 +167,8 @@ const Checkout = () => {
             required
             value={address.street}
             onChange={(e) =>
-            setAddress({ ...address, street: e.target.value })
-          }
+              setAddress({ ...address, street: e.target.value })
+            }
           />
 
           <input
@@ -244,7 +208,6 @@ const Checkout = () => {
               Continue
             </button>
           </div>
-
         </form>
       </div>
     </div>
