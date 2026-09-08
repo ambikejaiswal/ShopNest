@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import API from "../api/axios";
 
 const MyOrders = () => {
   const { user } = useContext(AuthContext);
@@ -10,21 +11,14 @@ const MyOrders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch("/api/orders/myorders", {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
+        const response = await API.get("/orders/myorders");
 
-        const data = await response.json();
-
-        if (response.ok) {
-          setOrders(data);
-        } else {
-          console.error(data.message);
-        }
+        setOrders(response.data);
       } catch (error) {
         console.error("MY ORDERS ERROR:", error);
+        console.error(
+          error.response?.data?.message || "Failed to fetch orders"
+        );
       } finally {
         setLoading(false);
       }
@@ -59,8 +53,7 @@ const MyOrders = () => {
             </p>
 
             <p>
-              <strong>Payment ID:</strong> {order.paymentId}
-            </p>
+              <strong>Payment ID:</strong> {order.paymentId}</p>
 
             <h4>Products</h4>
 
@@ -84,9 +77,11 @@ const MyOrders = () => {
 
             <p>{order.address.fullName}</p>
             <p>{order.address.street}</p>
+
             <p>
               {order.address.city} - {order.address.postalCode}
             </p>
+
             <p>{order.address.country}</p>
           </div>
         ))
