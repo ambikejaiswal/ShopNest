@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import API from "../api/axios";
 
 const Orders = () => {
   const { user } = useContext(AuthContext);
@@ -9,21 +10,16 @@ const Orders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch("/api/orders/myorders", {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
+        const response = await API.get("/orders/myorders");
 
-        const data = await response.json();
+        const data = response.data;
 
-        if (response.ok) {
-          setOrders(data);
-        } else {
-          console.error(data.message);
-        }
+        setOrders(data);
       } catch (error) {
-        console.error("GET ORDERS ERROR:", error);
+        console.error(
+          "GET ORDERS ERROR:",
+          error.response?.data || error.message
+        );
       } finally {
         setLoading(false);
       }
@@ -49,13 +45,9 @@ const Orders = () => {
           <div key={order._id}>
             <h3>Order ID: {order._id}</h3>
 
-            <p>
-              Total: ₹{order.totalAmount}
-            </p>
+            <p>Total: ₹{order.totalAmount}</p>
 
-            <p>
-              Status: {order.status}
-            </p>
+            <p>Status: {order.status}</p>
 
             <h4>Products:</h4>
 
